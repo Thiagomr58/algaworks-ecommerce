@@ -15,6 +15,27 @@ import java.math.BigDecimal;
 public class OperacoesComTransacaoTest extends EntityManagerTest {
 
     @Test
+    public void atualizarObjeto() {
+        Produto produto = new Produto();
+        produto.setId(1);
+        produto.setNome("Kindle Paperwhite");
+        produto.setDescricao("Conheça o novo Kindle.");
+        produto.setPreco(new BigDecimal(599));
+
+        // No metodo de merge, não tem a necesidade de begin/commit a transação
+        // funciona pq o EM joga o obj na memoria e quando o EM percebe que tem um dado na memoria, ele joga para o BD
+        entityManager.getTransaction().begin();
+        entityManager.merge(produto);
+        entityManager.getTransaction().commit();
+
+        entityManager.clear(); // limpo pois o EM salva o registro em memoria, como eu faço o .clear() eu forço ele a ir no BD
+
+        Produto produtoVerificacao = entityManager.find(Produto.class, produto.getId());
+        Assert.assertNotNull(produtoVerificacao);
+        Assert.assertEquals("Kindle Paperwhite", produtoVerificacao.getNome());
+    }
+
+    @Test
     public void removerObjeto() {
         Produto produto = entityManager.find(Produto.class, 3);
 

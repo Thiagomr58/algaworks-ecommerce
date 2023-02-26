@@ -15,6 +15,53 @@ import java.math.BigDecimal;
 public class OperacoesComTransacaoTest extends EntityManagerTest {
 
     @Test
+    public void mostrarDiferencaPersistMerge() {
+        // Persist: Apenas inserção
+        // Merge: Funciona das duas formas: Inserção/Atualização
+
+        Produto produtoPersist = new Produto();
+
+        produtoPersist.setId(5);
+        produtoPersist.setNome("Smartphone One Plus");
+        produtoPersist.setDescricao("O processador mais rapido.");
+        produtoPersist.setPreco(new BigDecimal(2000));
+
+        entityManager.getTransaction().begin();
+        entityManager.persist(produtoPersist);
+        produtoPersist.setNome("Smartphone Two Plus");
+        entityManager.getTransaction().commit();
+
+        entityManager.clear();
+
+        Produto produtoVerificacaoPersist = entityManager.find(Produto.class, produtoPersist.getId());
+        Assert.assertNotNull(produtoVerificacaoPersist);
+
+        Produto produtoMerge = new Produto();
+
+        produtoMerge.setId(6);
+        produtoMerge.setNome("Notebook Dell");
+        produtoMerge.setDescricao("O melhor da categoria.");
+        produtoMerge.setPreco(new BigDecimal(4000));
+
+        entityManager.getTransaction().begin();
+
+        // o merge gera um copia do obj e joga dentro do entityManager, ai, se eu atualizar o nome, não vai funcionar pq o set não é uma instancia gerenciada
+        // entityManager.merge(produtoMerge);
+        // produtoMerge.setNome("Notebook Dell Vostro ");
+
+        // Pra funcionar eu faço o merge e recebo a copia do obj e dai sim eu consigo alterar o nome com o set.
+        produtoMerge = entityManager.merge(produtoMerge);
+        produtoMerge.setNome("Notebook Dell 2");
+
+        entityManager.getTransaction().commit();
+
+        entityManager.clear();
+
+        Produto produtoVerificacaoMerge = entityManager.find(Produto.class, produtoMerge.getId());
+        Assert.assertNotNull(produtoVerificacaoMerge);
+    }
+
+    @Test
     public void inserirObjetoComMerge() {
         Produto produto = new Produto();
 

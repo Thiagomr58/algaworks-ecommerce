@@ -15,6 +15,25 @@ import java.math.BigDecimal;
 public class OperacoesComTransacaoTest extends EntityManagerTest {
 
     @Test
+    public void inserirObjetoComMerge() {
+        Produto produto = new Produto();
+
+        produto.setId(4);
+        produto.setNome("Microfone Rode Videmio");
+        produto.setDescricao("A melhor qualidade de som.");
+        produto.setPreco(new BigDecimal(1000));
+
+        entityManager.getTransaction().begin();
+        entityManager.merge(produto);
+        entityManager.getTransaction().commit();
+
+        entityManager.clear(); // limpo pois o EM salva o registro em memoria, como eu faço o .clear() eu forço ele a ir no BD
+
+        Produto produtoVerificado = entityManager.find(Produto.class, produto.getId());
+        Assert.assertNotNull(produtoVerificado);
+    }
+
+    @Test
     public void atualizarObjetoGerenciado() {
         Produto produto = entityManager.find(Produto.class, 1);
 

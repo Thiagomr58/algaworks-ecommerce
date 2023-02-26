@@ -16,6 +16,7 @@ public class OperacoesComTransacaoTest extends EntityManagerTest {
 
     @Test
     public void atualizarObjeto() {
+        // Dessa forma o EM exige que todos os dados estejam preenchidos, caso um deles não esteja setado, o EM vai entender que vc quer setar null no valor do atributo que não foi preenchido.
         Produto produto = new Produto();
         produto.setId(1);
         produto.setNome("Kindle Paperwhite");
